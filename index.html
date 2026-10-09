@@ -1,0 +1,1559 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nihongo Quest — 日本語クエスト</title>
+  <style>
+    /* ==========================================
+       1. CSS VARIABLE & RESET
+       ========================================== */
+    :root {
+      --primary: #D7000F;
+      --primary-dark: #A0000B;
+      --accent: #FFB703;
+      --bg-color: #FDFBF7;
+      --card-bg: #FFFFFF;
+      --text-main: #1E1E24;
+      --text-muted: #6C757D;
+      --success: #2E7D32;
+      --success-bg: #E8F5E9;
+      --danger: #C62828;
+      --danger-bg: #FFEBEE;
+      --border-radius: 16px;
+      --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.1);
+      --transition: all 0.3s ease;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, "Noto Sans JP", sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      top: -150px;
+      right: -150px;
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(215, 0, 15, 0.06) 0%, rgba(255,255,255,0) 70%);
+      border-radius: 50%;
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    /* ==========================================
+       2. LAYOUT & NAVIGATION
+       ========================================== */
+    header {
+      background: var(--card-bg);
+      border-bottom: 2px solid rgba(215, 0, 15, 0.1);
+      padding: 1rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: var(--shadow-sm);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+    }
+
+    .logo-mark {
+      width: 36px;
+      height: 36px;
+      background-color: var(--primary);
+      color: #fff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 1.2rem;
+      box-shadow: 0 2px 8px rgba(215, 0, 15, 0.3);
+    }
+
+    .logo-text h1 {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: var(--primary);
+      line-height: 1;
+    }
+
+    .logo-text span {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .nav-actions {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .btn-icon {
+      background: var(--bg-color);
+      border: 1px solid #E0E0E0;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      transition: var(--transition);
+    }
+
+    .btn-icon:hover {
+      background: #F0F0F0;
+      transform: scale(1.05);
+    }
+
+    main {
+      flex: 1;
+      max-width: 900px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 1.5rem;
+    }
+
+    .view-section {
+      display: none;
+      animation: fadeIn 0.4s ease-in-out;
+    }
+
+    .view-section.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ==========================================
+       3. COMPONENTS & BUTTONS
+       ========================================== */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 0.85rem 1.75rem;
+      font-size: 1rem;
+      font-weight: 700;
+      border-radius: 12px;
+      border: none;
+      cursor: pointer;
+      transition: var(--transition);
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #FFF;
+      box-shadow: 0 4px 14px rgba(215, 0, 15, 0.3);
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-dark);
+      transform: translateY(-2px);
+    }
+
+    .btn-secondary {
+      background: #EAEAEA;
+      color: var(--text-main);
+    }
+
+    .btn-secondary:hover {
+      background: #DDD;
+      transform: translateY(-2px);
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 2px solid var(--primary);
+      color: var(--primary);
+    }
+
+    .btn-outline:hover {
+      background: rgba(215, 0, 15, 0.05);
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: var(--border-radius);
+      padding: 1.5rem;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid rgba(0, 0, 0, 0.04);
+      margin-bottom: 1.5rem;
+    }
+
+    /* ==========================================
+       4. HOME VIEW & DASHBOARD
+       ========================================== */
+    .hero-card {
+      background: linear-gradient(135deg, #FFF 0%, #FFF5F5 100%);
+      border: 2px solid rgba(215, 0, 15, 0.15);
+      text-align: center;
+      padding: 2.5rem 1.5rem;
+      position: relative;
+    }
+
+    .mascot-box {
+      font-size: 3.5rem;
+      margin-bottom: 0.5rem;
+      animation: floatMascot 3s ease-in-out infinite;
+    }
+
+    @keyframes floatMascot {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    .speech-bubble {
+      background: var(--card-bg);
+      border: 1px solid #E0E0E0;
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      display: inline-block;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--primary);
+      margin-bottom: 1rem;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .user-profile-summary {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+
+    .stat-pill {
+      background: var(--card-bg);
+      padding: 1rem;
+      border-radius: 12px;
+      text-align: center;
+      border: 1px solid rgba(0,0,0,0.06);
+    }
+
+    .stat-pill .val {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--primary);
+    }
+
+    .stat-pill .lbl {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .action-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+
+    @media (min-width: 600px) {
+      .action-grid {
+        grid-template-columns: 2fr 1fr 1fr;
+      }
+    }
+
+    /* ==========================================
+       5. QUIZ VIEW
+       ========================================== */
+    .quiz-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .progress-bar-container {
+      width: 100%;
+      height: 10px;
+      background: #E0E0E0;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 1.5rem;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+      width: 0%;
+      transition: width 0.4s ease;
+    }
+
+    .quiz-meta-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+
+    .timer-badge {
+      background: #FFF3E0;
+      color: #E65100;
+      padding: 4px 10px;
+      border-radius: 20px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .streak-badge {
+      background: #E3F2FD;
+      color: #1565C0;
+      padding: 4px 10px;
+      border-radius: 20px;
+    }
+
+    .question-card {
+      text-align: center;
+      padding: 2.5rem 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .question-text {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--text-main);
+      line-height: 1.4;
+    }
+
+    .options-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.85rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .option-card {
+      background: var(--card-bg);
+      border: 2px solid #E5E5E5;
+      padding: 1.1rem 1.25rem;
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 1.05rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: var(--transition);
+      text-align: left;
+    }
+
+    .option-card:hover:not(.disabled) {
+      border-color: var(--primary);
+      background: #FFF9F9;
+      transform: translateX(4px);
+    }
+
+    .option-prefix {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: #F0F0F0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      color: var(--text-main);
+      flex-shrink: 0;
+    }
+
+    .option-card.correct {
+      border-color: var(--success);
+      background: var(--success-bg);
+      color: var(--success);
+    }
+
+    .option-card.correct .option-prefix {
+      background: var(--success);
+      color: #FFF;
+    }
+
+    .option-card.wrong {
+      border-color: var(--danger);
+      background: var(--danger-bg);
+      color: var(--danger);
+    }
+
+    .option-card.wrong .option-prefix {
+      background: var(--danger);
+      color: #FFF;
+    }
+
+    .option-card.disabled {
+      cursor: default;
+    }
+
+    .feedback-banner {
+      padding: 1rem 1.25rem;
+      border-radius: 12px;
+      margin-bottom: 1.5rem;
+      display: none;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .feedback-banner.correct {
+      background: var(--success-bg);
+      border: 1px solid var(--success);
+      color: var(--success);
+    }
+
+    .feedback-banner.wrong {
+      background: var(--danger-bg);
+      border: 1px solid var(--danger);
+      color: var(--danger);
+    }
+
+    .feedback-title {
+      font-weight: 800;
+      font-size: 1.1rem;
+      margin-bottom: 4px;
+    }
+
+    .feedback-explain {
+      font-size: 0.95rem;
+      color: var(--text-main);
+    }
+
+    .quiz-nav-footer {
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    /* ==========================================
+       6. RESULT VIEW
+       ========================================== */
+    .result-card {
+      text-align: center;
+      padding: 3rem 1.5rem;
+    }
+
+    .score-circle {
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: #FFF;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin: 1.5rem auto;
+      box-shadow: 0 8px 24px rgba(215, 0, 15, 0.3);
+    }
+
+    .score-circle .num {
+      font-size: 3rem;
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    .score-circle .sub {
+      font-size: 0.8rem;
+      opacity: 0.9;
+    }
+
+    .result-category-badge {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--primary);
+      margin-bottom: 0.5rem;
+    }
+
+    .result-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+
+    @media (min-width: 600px) {
+      .result-grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+
+    /* ==========================================
+       7. HIRAGANA LEARNING VIEW
+       ========================================== */
+    .hiragana-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+      gap: 10px;
+      margin-top: 1rem;
+    }
+
+    .kana-card {
+      background: var(--card-bg);
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      border-radius: 12px;
+      padding: 0.75rem;
+      text-align: center;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .kana-card:hover {
+      border-color: var(--primary);
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .kana-char {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .kana-romaji {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    /* ==========================================
+       8. STATS & REVIEW VIEW
+       ========================================== */
+    .badge-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .badge-item {
+      background: var(--card-bg);
+      border: 1px solid #E0E0E0;
+      padding: 1rem;
+      border-radius: 12px;
+      text-align: center;
+      opacity: 0.4;
+      filter: grayscale(1);
+      transition: var(--transition);
+    }
+
+    .badge-item.unlocked {
+      opacity: 1;
+      filter: grayscale(0);
+      border-color: var(--accent);
+      background: #FFFDF5;
+    }
+
+    .badge-icon {
+      font-size: 2rem;
+      margin-bottom: 4px;
+    }
+
+    .badge-name {
+      font-size: 0.85rem;
+      font-weight: 700;
+    }
+
+    .review-item {
+      border-left: 4px solid var(--danger);
+      padding: 1rem;
+      background: #FFF;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      box-shadow: var(--shadow-sm);
+    }
+
+    #confetti-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 999;
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 200;
+    }
+
+    .modal-backdrop.active {
+      display: flex;
+    }
+
+    .modal-box {
+      background: #FFF;
+      padding: 2rem;
+      border-radius: var(--border-radius);
+      max-width: 400px;
+      width: 90%;
+      text-align: center;
+      box-shadow: var(--shadow-md);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <div class="logo" onclick="switchView('home-view')">
+      <div class="logo-mark">日</div>
+      <div class="logo-text">
+        <h1>Nihongo Quest</h1>
+        <span>日本語クエスト — JLPT N5</span>
+      </div>
+    </div>
+    <div class="nav-actions">
+      <button class="btn-icon" id="sound-toggle-btn" title="Toggle Suara" onclick="toggleSound()">🔊</button>
+      <button class="btn-icon" title="Beranda" onclick="switchView('home-view')">🏠</button>
+    </div>
+  </header>
+
+  <canvas id="confetti-canvas"></canvas>
+
+  <!-- MAIN CONTAINER -->
+  <main>
+
+    <!-- 1. HOME VIEW -->
+    <section id="home-view" class="view-section active">
+      <div class="card hero-card">
+        <div class="mascot-box">🐱🎏</div>
+        <div class="speech-bubble" id="mascot-quote">一歩ずつ！ Selangkah demi selangkah!</div>
+        <h2 style="font-size: 1.8rem; color: var(--primary); margin-bottom: 0.5rem;">Selamat Datang!</h2>
+        <p style="color: var(--text-muted); font-size: 0.95rem;">"Belajar Bahasa Jepang, Satu Soal Setiap Langkah!"</p>
+
+        <div class="user-profile-summary">
+          <div class="stat-pill">
+            <div class="val" id="user-level">Lv. 1</div>
+            <div class="lbl">Level Pengguna</div>
+          </div>
+          <div class="stat-pill">
+            <div class="val" id="user-xp">0 XP</div>
+            <div class="lbl">Total Pengalaman</div>
+          </div>
+          <div class="stat-pill">
+            <div class="val" id="total-answered-stat">0 / 100</div>
+            <div class="lbl">Soal Dijawab</div>
+          </div>
+          <div class="stat-pill">
+            <div class="val" id="overall-accuracy-stat">0%</div>
+            <div class="lbl">Akurasi Rata-rata</div>
+          </div>
+        </div>
+
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem;">
+          💡 Total Bank Soal: <strong>100 Soal</strong> | Setiap sesi berisi <strong>25 Soal Acak</strong>
+        </p>
+
+        <div class="action-grid">
+          <button class="btn btn-primary" onclick="showModeModal()">🚀 Mulai Belajar</button>
+          <button class="btn btn-secondary" onclick="switchView('stats-view')">📊 Statistik</button>
+          <button class="btn btn-outline" onclick="switchView('hiragana-view')">🈁 Hiragana</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. QUIZ VIEW -->
+    <section id="quiz-view" class="view-section">
+      <div class="quiz-header">
+        <span id="quiz-progress-text" style="font-weight: 700; color: var(--text-muted);">Soal 1 dari 25</span>
+        <div style="display: flex; gap: 8px;">
+          <span class="streak-badge" id="streak-badge">🔥 Streak: 0</span>
+          <span class="timer-badge" id="timer-badge" style="display: none;">⏱️ <span id="timer-val">20</span>s</span>
+        </div>
+      </div>
+
+      <div class="progress-bar-container">
+        <div class="progress-bar-fill" id="quiz-progress-fill"></div>
+      </div>
+
+      <div class="quiz-meta-row">
+        <span style="color: var(--success);">✓ Benar: <strong id="live-correct">0</strong></span>
+        <span style="color: var(--danger);">✗ Salah: <strong id="live-wrong">0</strong></span>
+      </div>
+
+      <div class="card question-card">
+        <div class="question-text" id="question-text">Pemuatan Soal...</div>
+      </div>
+
+      <div class="options-grid" id="options-container"></div>
+
+      <div class="feedback-banner" id="feedback-banner">
+        <div class="feedback-title" id="feedback-title">正解！ — Jawaban Benar!</div>
+        <div class="feedback-explain" id="feedback-explain">Pembahasan akan muncul di sini.</div>
+      </div>
+
+      <div class="quiz-nav-footer">
+        <button class="btn btn-primary" id="next-btn" style="display: none;" onclick="nextQuestion()">Soal Berikutnya ➡️</button>
+      </div>
+    </section>
+
+    <!-- 3. RESULT VIEW -->
+    <section id="result-view" class="view-section">
+      <div class="card result-card">
+        <div class="result-category-badge" id="result-category">すごいです！</div>
+        <p id="result-motivation-msg" style="color: var(--text-muted);">Kerja luar biasa dalam menyelesaikan sesi ini!</p>
+
+        <div class="score-circle">
+          <div class="num" id="result-score">0</div>
+          <div class="sub">SKOR AKHIR</div>
+        </div>
+
+        <div class="result-grid">
+          <div class="stat-pill">
+            <div class="val" id="res-correct" style="color: var(--success);">0</div>
+            <div class="lbl">Jawaban Benar</div>
+          </div>
+          <div class="stat-pill">
+            <div class="val" id="res-wrong" style="color: var(--danger);">0</div>
+            <div class="lbl">Jawaban Salah</div>
+          </div>
+          <div class="stat-pill">
+            <div class="val" id="res-accuracy">0%</div>
+            <div class="lbl">Akurasi Sesi</div>
+          </div>
+          <div class="stat-pill">
+            <div class="val" id="res-time">00:00</div>
+            <div class="lbl">Durasi Pengerjaan</div>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 1.5rem;">
+          <button class="btn btn-primary" onclick="startNewSession()">🔄 Mulai Sesi Baru</button>
+          <button class="btn btn-secondary" onclick="switchView('review-view')">📖 Review Jawaban</button>
+          <button class="btn btn-outline" onclick="switchView('home-view')">🏠 Halaman Utama</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. STATS VIEW -->
+    <section id="stats-view" class="view-section">
+      <h2 style="margin-bottom: 1rem; color: var(--primary);">📊 Statistik Perkembangan Belajar</h2>
+      
+      <div class="card">
+        <div class="user-profile-summary">
+          <div class="stat-pill">
+            <div class="val" id="st-sessions">0</div>
+            <div class="lbl">Sesi Selesai</div>
+          </div>
+          <div class="stat-pill">
+            <div class="val" id="st-high-score">0</div>
+            <div class="lbl">Skor Tertinggi</div>
+          </div>
+          <div class="stat-pill">
+            <div class="val" id="st-total-answered">0</div>
+            <div class="lbl">Soal Dijawab</div>
+          </div>
+          <div class="stat-pill">
+            <div class="val" id="st-accuracy">0%</div>
+            <div class="lbl">Akurasi Rata-rata</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 style="margin-bottom: 1rem;">🏆 Badge Pencapaian</h3>
+        <div class="badge-grid">
+          <div class="badge-item" id="badge-first-step">
+            <div class="badge-icon">🌱</div>
+            <div class="badge-name">First Step</div>
+            <div style="font-size: 0.7rem; color: var(--text-muted);">Selesaikan Sesi Pertama</div>
+          </div>
+          <div class="badge-item" id="badge-perfect">
+            <div class="badge-icon">💯</div>
+            <div class="badge-name">Perfect Score</div>
+            <div style="font-size: 0.7rem; color: var(--text-muted);">Dapatkan Skor 100</div>
+          </div>
+          <div class="badge-item" id="badge-hiragana">
+            <div class="badge-icon">🎌</div>
+            <div class="badge-name">Hiragana Master</div>
+            <div style="font-size: 0.7rem; color: var(--text-muted);">Akurasi &ge; 90%</div>
+          </div>
+          <div class="badge-item" id="badge-persistent">
+            <div class="badge-icon">🔥</div>
+            <div class="badge-name">Persistent</div>
+            <div style="font-size: 0.7rem; color: var(--text-muted);">Selesaikan 4 Sesi</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem;">
+        <button class="btn btn-secondary" onclick="switchView('home-view')">⬅️ Kembali</button>
+        <button class="btn btn-outline" style="border-color: var(--danger); color: var(--danger);" onclick="showResetConfirmModal()">🗑️ Reset Progres</button>
+      </div>
+    </section>
+
+    <!-- 5. REVIEW VIEW -->
+    <section id="review-view" class="view-section">
+      <h2 style="margin-bottom: 1rem; color: var(--primary);">📖 Review Soal</h2>
+      <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Evaluasi dan pelajari kembali soal-soal yang pernah dijawab salah pada sesi terakhir.</p>
+
+      <div id="review-list-container"></div>
+
+      <div style="margin-top: 1.5rem; display: flex; gap: 1rem;">
+        <button class="btn btn-primary" onclick="startNewSession()">🔄 Coba Sesi Baru</button>
+        <button class="btn btn-secondary" onclick="switchView('home-view')">🏠 Beranda</button>
+      </div>
+    </section>
+
+    <!-- 6. HIRAGANA LEARNING VIEW -->
+    <section id="hiragana-view" class="view-section">
+      <h2 style="margin-bottom: 0.5rem; color: var(--primary);">🈁 Belajar Hiragana Dasar</h2>
+      <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;">
+        Klik pada setiap karakter untuk mendengarkan pelafalan bahasa Jepang (Audio Web Speech API).
+      </p>
+
+      <div class="hiragana-grid" id="hiragana-container"></div>
+
+      <div style="margin-top: 2rem;">
+        <button class="btn btn-secondary" onclick="switchView('home-view')">⬅️ Kembali ke Beranda</button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- MODAL SELEKSI MODE -->
+  <div class="modal-backdrop" id="mode-modal">
+    <div class="modal-box">
+      <h3 style="margin-bottom: 0.5rem; color: var(--primary);">Pilih Mode Belajar</h3>
+      <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1.5rem;">Sesuaikan dengan kenyamanan waktu belajar Anda.</p>
+      
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+        <button class="btn btn-primary" onclick="initQuizSession(false)">🌱 Mode Latihan (Santai / Tanpa Timer)</button>
+        <button class="btn btn-outline" onclick="initQuizSession(true)">⚡ Mode Tantangan (Timer 20 Detik/Soal)</button>
+        <button class="btn btn-secondary" style="margin-top: 10px;" onclick="hideModeModal()">Batal</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL KONFIRMASI RESET -->
+  <div class="modal-backdrop" id="reset-modal">
+    <div class="modal-box">
+      <h3 style="margin-bottom: 0.5rem; color: var(--danger);">Reset Seluruh Progres?</h3>
+      <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1.5rem;">Tindakan ini akan menghapus XP, Level, Statistik, dan Riwayat Siklus Soal secara permanen.</p>
+
+      <div style="display: flex; gap: 10px; justify-content: center;">
+        <button class="btn btn-secondary" onclick="hideResetConfirmModal()">Batal</button>
+        <button class="btn btn-primary" style="background: var(--danger);" onclick="resetAllProgress()">Ya, Reset</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // BANK SOAL LENGKAP (100 SOAL)
+    const rawQuestionBank = [
+      { id: 1, q: "Apa arti dari あさ?", options: ["Malam", "Pagi", "Siang"], answer: 1, explain: "あさ (asa) artinya Pagi." },
+      { id: 2, q: "Apa arti dari よる?", options: ["Malam", "Pagi", "Sore"], answer: 0, explain: "よる (yoru) artinya Malam." },
+      { id: 3, q: "Apa arti dari みず?", options: ["Susu", "Teh", "Air"], answer: 2, explain: "みず (mizu) artinya Air." },
+      { id: 4, q: "Apa arti dari ごはん?", options: ["Nasi atau makanan", "Buku", "Rumah"], answer: 0, explain: "ごはん (gohan) artinya Nasi atau Makanan." },
+      { id: 5, q: "Apa arti dari がっこう?", options: ["Rumah sakit", "Sekolah", "Stasiun"], answer: 1, explain: "がっこう (gakkou) artinya Sekolah." },
+      { id: 6, q: "Apa arti dari ともだち?", options: ["Guru", "Keluarga", "Teman"], answer: 2, explain: "ともだち (tomodachi) artinya Teman." },
+      { id: 7, q: "Apa arti dari せんせい?", options: ["Guru", "Murid", "Teman"], answer: 0, explain: "せんせい (sensei) artinya Guru." },
+      { id: 8, q: "Apa arti dari ほん?", options: ["Pensil", "Buku", "Tas"], answer: 1, explain: "ほん (hon) artinya Buku." },
+      { id: 9, q: "Apa arti dari いえ?", options: ["Toko", "Sekolah", "Rumah"], answer: 2, explain: "いえ (ie) artinya Rumah." },
+      { id: 10, q: "Apa arti dari くるま?", options: ["Mobil", "Sepeda", "Kereta"], answer: 0, explain: "くるま (kuruma) artinya Mobil." },
+      { id: 11, q: "Apa arti dari でんしゃ?", options: ["Pesawat", "Kereta", "Bus"], answer: 1, explain: "でんしゃ (densha) artinya Kereta Api." },
+      { id: 12, q: "Apa arti dari ねこ?", options: ["Anjing", "Burung", "Kucing"], answer: 2, explain: "ねこ (neko) artinya Kucing." },
+      { id: 13, q: "Apa arti dari いぬ?", options: ["Anjing", "Kucing", "Ikan"], answer: 0, explain: "いぬ (inu) artinya Anjing." },
+      { id: 14, q: "Apa arti dari たべもの?", options: ["Minuman", "Makanan", "Pakaian"], answer: 1, explain: "たべもの (tabemono) artinya Makanan." },
+      { id: 15, q: "Apa arti dari のみもの?", options: ["Makanan", "Buah", "Minuman"], answer: 2, explain: "のみもの (nomimono) artinya Minuman." },
+      { id: 16, q: "Apa arti dari きょう?", options: ["Hari ini", "Kemarin", "Besok"], answer: 0, explain: "きょう (kyou) artinya Hari ini." },
+      { id: 17, q: "Apa arti dari あした?", options: ["Kemarin", "Besok", "Hari ini"], answer: 1, explain: "あした (ashita) artinya Besok." },
+      { id: 18, q: "Apa arti dari きのう?", options: ["Besok", "Hari ini", "Kemarin"], answer: 2, explain: "きのう (kinou) artinya Kemarin." },
+      { id: 19, q: "Apa arti dari いま?", options: ["Sekarang", "Nanti", "Kemarin"], answer: 0, explain: "いま (ima) artinya Sekarang." },
+      { id: 20, q: "Apa arti dari おかね?", options: ["Waktu", "Uang", "Air"], answer: 1, explain: "おかね (okane) artinya Uang." },
+      { id: 21, q: "Apa arti dari たべます?", options: ["Tidur", "Makan", "Minum"], answer: 1, explain: "たべます (tabemasu) artinya Makan." },
+      { id: 22, q: "Apa arti dari のみます?", options: ["Minum", "Membaca", "Pergi"], answer: 0, explain: "のみます (nomimasu) artinya Minum." },
+      { id: 23, q: "Apa arti dari ねます?", options: ["Bangun", "Belajar", "Tidur"], answer: 2, explain: "ねます (nemasu) artinya Tidur." },
+      { id: 24, q: "Apa arti dari おきます?", options: ["Tidur", "Bangun", "Pulang"], answer: 1, explain: "おきます (okimasu) artinya Bangun." },
+      { id: 25, q: "Apa arti dari いきます?", options: ["Pergi", "Datang", "Pulang"], answer: 0, explain: "いきます (ikimasu) artinya Pergi." },
+      { id: 26, q: "Apa arti dari きます?", options: ["Membeli", "Pulang", "Datang"], answer: 2, explain: "きます (kimasu) artinya Datang." },
+      { id: 27, q: "Apa arti dari かえります?", options: ["Pergi", "Pulang", "Membaca"], answer: 1, explain: "かえります (kaerimasu) artinya Pulang." },
+      { id: 28, q: "Apa arti dari みます?", options: ["Melihat atau menonton", "Mendengar", "Menulis"], answer: 0, explain: "みます (mimasu) artinya Melihat atau Menonton." },
+      { id: 29, q: "Apa arti dari ききます?", options: ["Berbicara", "Membeli", "Mendengar atau bertanya"], answer: 2, explain: "ききます (kikimasu) artinya Mendengar atau Bertanya." },
+      { id: 30, q: "Apa arti dari よみます?", options: ["Menulis", "Membaca", "Berbicara"], answer: 1, explain: "よみます (yomimasu) artinya Membaca." },
+      { id: 31, q: "Apa arti dari かきます?", options: ["Menulis", "Membaca", "Mendengar"], answer: 0, explain: "かきます (kakimasu) artinya Menulis." },
+      { id: 32, q: "Apa arti dari はなします?", options: ["Tidur", "Makan", "Berbicara"], answer: 2, explain: "はなします (hanashimasu) artinya Berbicara." },
+      { id: 33, q: "Apa arti dari べんきょうします?", options: ["Bekerja", "Belajar", "Bermain"], answer: 1, explain: "べんきょうします (benkyoushimasu) artinya Belajar." },
+      { id: 34, q: "Apa arti dari はたらきます?", options: ["Bekerja", "Belajar", "Berjalan"], answer: 0, explain: "はたらきます (hatarakimasu) artinya Bekerja." },
+      { id: 35, q: "Apa arti dari かいます?", options: ["Menjual", "Membaca", "Membeli"], answer: 2, explain: "かいます (kaimasu) artinya Membeli." },
+      { id: 36, q: "Apa arti dari あいます?", options: ["Makan", "Bertemu", "Tidur"], answer: 1, explain: "あいます (aimasu) artinya Bertemu." },
+      { id: 37, q: "Apa arti dari まちます?", options: ["Menunggu", "Berjalan", "Berbicara"], answer: 0, explain: "まちます (machimasu) artinya Menunggu." },
+      { id: 38, q: "Apa arti dari つくります?", options: ["Menggunakan", "Membuka", "Membuat"], answer: 2, explain: "つくります (tsukurimasu) artinya Membuat." },
+      { id: 39, q: "Apa arti dari あそびます?", options: ["Belajar", "Bermain", "Bekerja"], answer: 1, explain: "あそびます (asobimasu) artinya Bermain." },
+      { id: 40, q: "Apa arti dari わかります?", options: ["Mengerti", "Lupa", "Membeli"], answer: 0, explain: "わかります (wakarimasu) artinya Mengerti." },
+      { id: 41, q: "Manakah hiragana untuk bunyi 'a'?", options: ["い", "あ", "う"], answer: 1, explain: "あ adalah karakter hiragana untuk vokal 'a'." },
+      { id: 42, q: "Manakah hiragana untuk bunyi 'ki'?", options: ["き", "さ", "ち"], answer: 0, explain: "き adalah karakter hiragana untuk bunyi 'ki'." },
+      { id: 43, q: "Manakah hiragana untuk bunyi 'su'?", options: ["せ", "し", "す"], answer: 2, explain: "す adalah karakter hiragana untuk bunyi 'su'." },
+      { id: 44, q: "Manakah hiragana untuk bunyi 'ne'?", options: ["ぬ", "ね", "の"], answer: 1, explain: "ね adalah karakter hiragana untuk bunyi 'ne'." },
+      { id: 45, q: "Manakah hiragana untuk bunyi 'ho'?", options: ["ほ", "は", "へ"], answer: 0, explain: "ほ adalah karakter hiragana untuk bunyi 'ho'." },
+      { id: 46, q: "Manakah hiragana untuk bunyi 'mu'?", options: ["め", "も", "む"], answer: 2, explain: "む adalah karakter hiragana untuk bunyi 'mu'." },
+      { id: 47, q: "Manakah hiragana untuk bunyi 'ri'?", options: ["る", "り", "れ"], answer: 1, explain: "り adalah karakter hiragana untuk bunyi 'ri'." },
+      { id: 48, q: "Manakah hiragana untuk bunyi 'yo'?", options: ["よ", "や", "ゆ"], answer: 0, explain: "よ adalah karakter hiragana untuk bunyi 'yo'." },
+      { id: 49, q: "Manakah hiragana untuk bunyi 'wa'?", options: ["を", "ん", "わ"], answer: 2, explain: "わ adalah karakter hiragana untuk bunyi 'wa'." },
+      { id: 50, q: "Manakah hiragana untuk bunyi 'tsu'?", options: ["て", "つ", "と"], answer: 1, explain: "つ adalah karakter hiragana untuk bunyi 'tsu'." },
+      { id: 51, q: "Bagaimana membaca さかな?", options: ["Sakana", "Sakani", "Sakane"], answer: 0, explain: "さかな dibaca Sakana (artinya Ikan)." },
+      { id: 52, q: "Bagaimana membaca やま?", options: ["Yami", "Yuma", "Yama"], answer: 2, explain: "やま dibaca Yama (artinya Gunung)." },
+      { id: 53, q: "Bagaimana membaca そら?", options: ["Sorae", "Sora", "Sura"], answer: 1, explain: "そら dibaca Sora (artinya Langit)." },
+      { id: 54, q: "Bagaimana membaca はな?", options: ["Hana", "Hane", "Hina"], answer: 0, explain: "はな dibaca Hana (artinya Bunga/Hidung)." },
+      { id: 55, q: "Bagaimana membaca くち?", options: ["Kuchi", "Kutsu", "Kuchī"], answer: 0, explain: "くち dibaca Kuchi (artinya Mulut)." },
+      { id: 56, q: "Bagaimana membaca みみ?", options: ["Mimi", "Mame", "Mumu"], answer: 0, explain: "みみ dibaca Mimi (artinya Telinga)." },
+      { id: 57, q: "Bagaimana membaca あたま?", options: ["Atama", "Atami", "Atamu"], answer: 0, explain: "あたま dibaca Atama (artinya Kepala)." },
+      { id: 58, q: "Bagaimana membaca からだ?", options: ["Karada", "Korada", "Kurada"], answer: 0, explain: "からだ dibaca Karada (artinya Tubuh)." },
+      { id: 59, q: "Bagaimana membaca でんわ?", options: ["Denwa", "Dengwa", "Denha"], answer: 0, explain: "でんわ dibaca Denwa (artinya Telepon)." },
+      { id: 60, q: "Bagaimana membaca じかん?", options: ["Jikan", "Jiken", "Jukan"], answer: 0, explain: "じかん dibaca Jikan (artinya Waktu)." },
+      { id: 61, q: "わたし ___ がくせいです。", options: ["を", "は", "に"], answer: 1, explain: "Partikel は (wa) digunakan sebagai penanda subjek/topik kalimat." },
+      { id: 62, q: "みず ___ のみます。", options: ["を", "は", "で"], answer: 0, explain: "Partikel を (o) digunakan sebagai penanda objek langsung." },
+      { id: 63, q: "がっこう ___ いきます。", options: ["を", "が", "に"], answer: 2, explain: "Partikel に (ni) menunjukkan tempat tujuan gerakan." },
+      { id: 64, q: "ともだち ___ あいます。", options: ["に", "を", "で"], answer: 0, explain: "Kata kerja あいます (bertemu) berpasangan dengan partikel に." },
+      { id: 65, q: "うち ___ べんきょうします。", options: ["に", "で", "を"], answer: 1, explain: "Partikel で (de) menunjukkan tempat dilakukannya suatu aktivitas." },
+      { id: 66, q: "これは ___ です。", options: ["ほん", "たべます", "いきます"], answer: 0, explain: "ほん (Buku) adalah kata benda yang tepat setelah これ (ini)." },
+      { id: 67, q: "わたしは ごはんを ___。", options: ["のみます", "ねます", "たべます"], answer: 2, explain: "たべます (makan) adalah kata kerja berpasangan dengan ごはん (nasi)." },
+      { id: 68, q: "まいにち がっこうへ ___。", options: ["いきます", "たべます", "かきます"], answer: 0, explain: "いきます (pergi) adalah kata kerja berpasangan dengan tujuan がっこう (sekolah)." },
+      { id: 69, q: "よる 11じに ___。", options: ["おきます", "ねます", "きます"], answer: 1, explain: "ねます (tidur) cocok untuk waktu malam (よる 11じ)." },
+      { id: 70, q: "あさ 7じに ___。", options: ["ねます", "かえります", "おきます"], answer: 2, explain: "おきます (bangun) cocok untuk waktu pagi (あさ 7じ)." },
+      { id: 71, q: "ほんを ___。", options: ["よみます", "のみます", "あいます"], answer: 0, explain: "よみます (membaca) berpasangan dengan ほん (buku)." },
+      { id: 72, q: "てがみを ___。", options: ["みます", "かきます", "ききます"], answer: 1, explain: "かきます (menulis) berpasangan dengan てがみ (surat)." },
+      { id: 73, q: "おんがくを ___。", options: ["たべます", "いきます", "ききます"], answer: 2, explain: "ききます (mendengar) berpasangan dengan おんがく (musik)." },
+      { id: 74, q: "ともだちと ___。", options: ["はなします", "ねます", "のみます"], answer: 0, explain: "はなします (berbicara) cocok dengan ともだちと (bersama teman)." },
+      { id: 75, q: "みせで りんごを ___。", options: ["よみます", "かいます", "ねます"], answer: 1, explain: "かいます (membeli) berpasangan dengan りんご (apel) di みせ (toko)." },
+      { id: 76, q: "せんせいは がっこうに ___。", options: ["います", "あります", "たべます"], answer: 0, explain: "います (imasu) digunakan untuk keberadaan makhluk hidup (Guru)." },
+      { id: 77, q: "つくえのうえに ほんが ___。", options: ["います", "いきます", "あります"], answer: 2, explain: "あります (arimasu) digunakan untuk keberadaan benda mati (Buku)." },
+      { id: 78, q: "これは わたし ___ かばんです。", options: ["の", "を", "に"], answer: 0, explain: "Partikel の (no) menyatakan hubungan kepemilikan." },
+      { id: 79, q: "あした ともだち ___ あいます。", options: ["を", "に", "で"], answer: 1, explain: "Bertemu teman menggunakan partikel に." },
+      { id: 80, q: "まいあさ みず ___ のみます。", options: ["が", "で", "を"], answer: 2, explain: "Minum air menggunakan partikel objek を." },
+      { id: 81, q: "Apa arti dari ください?", options: ["Silakan berikan", "Selamat tinggal", "Terima kasih"], answer: 0, explain: "ください (kudasai) artinya Silakan berikan / Tolong." },
+      { id: 82, q: "Apa arti dari ありがとう?", options: ["Maaf", "Terima kasih", "Permisi"], answer: 1, explain: "ありがとう (arigatou) artinya Terima kasih." },
+      { id: 83, q: "Apa arti dari すみません?", options: ["Selamat pagi", "Sampai jumpa", "Permisi atau maaf"], answer: 2, explain: "すみません (sumimasen) artinya Permisi atau Maaf." },
+      { id: 84, q: "Apa arti dari おはよう?", options: ["Selamat pagi", "Selamat malam", "Selamat siang"], answer: 0, explain: "おはよう (ohayou) artinya Selamat pagi." },
+      { id: 85, q: "Apa arti dari こんばんは?", options: ["Selamat pagi", "Selamat malam", "Selamat tinggal"], answer: 1, explain: "こんばんは (konbanwa) artinya Selamat malam." },
+      { id: 86, q: "Apa arti dari さようなら?", options: ["Terima kasih", "Permisi", "Selamat tinggal"], answer: 2, explain: "さようなら (sayounara) artinya Selamat tinggal." },
+      { id: 87, q: "Apa arti dari どうぞ?", options: ["Silakan", "Tidak", "Mengapa"], answer: 0, explain: "どうぞ (douzo) artinya Silakan." },
+      { id: 88, q: "Apa arti dari どこ?", options: ["Kapan", "Di mana", "Siapa"], answer: 1, explain: "どこ (doko) artinya Di mana." },
+      { id: 89, q: "Apa arti dari いつ?", options: ["Siapa", "Apa", "Kapan"], answer: 2, explain: "いつ (itsu) artinya Kapan." },
+      { id: 90, q: "Apa arti dari だれ?", options: ["Siapa", "Di mana", "Mengapa"], answer: 0, explain: "だれ (dare) artinya Siapa." },
+      { id: 91, q: "Apa arti dari なに?", options: ["Kapan", "Apa", "Siapa"], answer: 1, explain: "なに (nani) artinya Apa." },
+      { id: 92, q: "Apa arti dari どうして?", options: ["Di mana", "Siapa", "Mengapa"], answer: 2, explain: "どうして (doushite) artinya Mengapa." },
+      { id: 93, q: "Apa arti dari いくら?", options: ["Berapa harga", "Jam berapa", "Berapa orang"], answer: 0, explain: "いくら (ikura) artinya Berapa harga." },
+      { id: 94, q: "Apa arti dari なんじ?", options: ["Berapa harga", "Jam berapa", "Hari apa"], answer: 1, explain: "なんじ (nanji) artinya Jam berapa." },
+      { id: 95, q: "Apa arti dari いっしょに?", options: ["Sendirian", "Besok", "Bersama-sama"], answer: 2, explain: "いっしょに (isshoni) artinya Bersama-sama." },
+      { id: 96, q: "Apa arti dari ちょっと?", options: ["Sedikit atau sebentar", "Sangat", "Selalu"], answer: 0, explain: "ちょっと (chotto) artinya Sedikit atau Sebentar." },
+      { id: 97, q: "Apa arti dari たくさん?", options: ["Sedikit", "Banyak", "Cepat"], answer: 1, explain: "たくさん (takusan) artinya Banyak." },
+      { id: 98, q: "Apa arti dari はやく?", options: ["Pelan-pelan", "Kemarin", "Cepat atau lebih awal"], answer: 2, explain: "はやく (hayaku) artinya Cepat atau Lebih awal." },
+      { id: 99, q: "Apa arti dari ゆっくり?", options: ["Pelan-pelan", "Cepat", "Banyak"], answer: 0, explain: "ゆっくり (yukkuri) artinya Pelan-pelan." },
+      { id: 100, q: "Apa arti dari もういちど?", options: ["Sampai besok", "Sekali lagi", "Terima kasih"], answer: 1, explain: "もういちど (mou ichido) artinya Sekali lagi." }
+    ];
+
+    const hiraganaList = [
+      { c: "あ", r: "a" }, { c: "い", r: "i" }, { c: "う", r: "u" }, { c: "え", r: "e" }, { c: "お", r: "o" },
+      { c: "か", r: "ka" }, { c: "き", r: "ki" }, { c: "く", r: "ku" }, { c: "け", r: "ke" }, { c: "こ", r: "ko" },
+      { c: "さ", r: "sa" }, { c: "し", r: "shi" }, { c: "す", r: "su" }, { c: "せ", r: "se" }, { c: "そ", r: "so" },
+      { c: "た", r: "ta" }, { c: "ち", r: "chi" }, { c: "つ", r: "tsu" }, { c: "て", r: "te" }, { c: "と", r: "to" },
+      { c: "な", r: "na" }, { c: "に", r: "ni" }, { c: "ぬ", r: "nu" }, { c: "ね", r: "ne" }, { c: "の", r: "no" },
+      { c: "は", r: "ha" }, { c: "ひ", r: "hi" }, { c: "ふ", r: "fu" }, { c: "へ", r: "he" }, { c: "ほ", r: "ho" },
+      { c: "ま", r: "ma" }, { c: "み", r: "mi" }, { c: "む", r: "mu" }, { c: "め", r: "me" }, { c: "も", r: "mo" },
+      { c: "や", r: "ya" }, { c: "", r: "" }, { c: "ゆ", r: "yu" }, { c: "", r: "" }, { c: "よ", r: "yo" },
+      { c: "ら", r: "ra" }, { c: "り", r: "ri" }, { c: "る", r: "ru" }, { c: "れ", r: "re" }, { c: "ろ", r: "ro" },
+      { c: "わ", r: "wa" }, { c: "", r: "" }, { c: "", r: "" }, { c: "", r: "" }, { c: "を", r: "wo" },
+      { c: "ん", r: "n" }
+    ];
+
+    const mascotQuotes = [
+      "一歩ずつ！ Selangkah demi selangkah!",
+      "Terus berlatih, kemampuan bahasa Jepangmu pasti meningkat!",
+      "間違いは学びのチャンス！ Kesalahan adalah kesempatan belajar!",
+      "継続は力なり！ Ketekunan adalah kunci keberhasilan!",
+      "素晴らしい！ Kamu melakukan yang terbaik hari ini!"
+    ];
+
+    let appData = {
+      xp: 0,
+      level: 1,
+      totalAnsweredLifetime: 0,
+      totalCorrectLifetime: 0,
+      sessionsCompleted: 0,
+      highScore: 0,
+      usedQuestionIds: [],
+      badges: [],
+      lastSessionWrong: []
+    };
+
+    let sessionState = {
+      questions: [],
+      currentIndex: 0,
+      correctCount: 0,
+      wrongCount: 0,
+      streak: 0,
+      isTimerActive: false,
+      timerSeconds: 20,
+      timerInterval: null,
+      startTime: null,
+      selectedAnswered: false
+    };
+
+    let isAudioMuted = false;
+
+    // AMAN DARI ERROR LOCALSTORAGE
+    function loadAppData() {
+      try {
+        const saved = localStorage.getItem('nihongo_quest_data');
+        if (saved) {
+          appData = { ...appData, ...JSON.parse(saved) };
+        }
+      } catch (e) {
+        console.warn("Storage tidak tersedia:", e);
+      }
+    }
+
+    function saveAppData() {
+      try {
+        localStorage.setItem('nihongo_quest_data', JSON.stringify(appData));
+      } catch (e) {
+        console.warn("Gagal menyimpan progres:", e);
+      }
+    }
+
+    function initApp() {
+      loadAppData();
+      updateDashboardUI();
+      renderHiraganaGrid();
+      setRandomMascotQuote();
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initApp);
+    } else {
+      initApp();
+    }
+
+    function updateDashboardUI() {
+      appData.level = Math.floor(appData.xp / 50) + 1;
+
+      document.getElementById('user-level').innerText = `Lv. ${appData.level}`;
+      document.getElementById('user-xp').innerText = `${appData.xp} XP`;
+      document.getElementById('total-answered-stat').innerText = `${appData.usedQuestionIds.length} / 100`;
+
+      const total = appData.totalAnsweredLifetime;
+      const accuracy = total > 0 ? Math.round((appData.totalCorrectLifetime / total) * 100) : 0;
+      document.getElementById('overall-accuracy-stat').innerText = `${accuracy}%`;
+
+      document.getElementById('st-sessions').innerText = appData.sessionsCompleted;
+      document.getElementById('st-high-score').innerText = appData.highScore;
+      document.getElementById('st-total-answered').innerText = appData.totalAnsweredLifetime;
+      document.getElementById('st-accuracy').innerText = `${accuracy}%`;
+
+      updateBadgesUI();
+    }
+
+    function setRandomMascotQuote() {
+      const q = mascotQuotes[Math.floor(Math.random() * mascotQuotes.length)];
+      document.getElementById('mascot-quote').innerText = q;
+    }
+
+    function switchView(viewId) {
+      document.querySelectorAll('.view-section').forEach(sec => sec.classList.remove('active'));
+      const target = document.getElementById(viewId);
+      if (target) {
+        target.classList.add('active');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+
+      if (viewId === 'home-view') {
+        updateDashboardUI();
+        setRandomMascotQuote();
+      } else if (viewId === 'review-view') {
+        renderReviewList();
+      }
+    }
+
+    function showModeModal() {
+      document.getElementById('mode-modal').classList.add('active');
+    }
+
+    function hideModeModal() {
+      document.getElementById('mode-modal').classList.remove('active');
+    }
+
+    function showResetConfirmModal() {
+      document.getElementById('reset-modal').classList.add('active');
+    }
+
+    function hideResetConfirmModal() {
+      document.getElementById('reset-modal').classList.remove('active');
+    }
+
+    function shuffleArray(array) {
+      const arr = [...array];
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    function select25SessionQuestions() {
+      let unused = rawQuestionBank.filter(q => !appData.usedQuestionIds.includes(q.id));
+
+      if (unused.length < 25) {
+        const remainingFromCurrentCycle = [...unused];
+        appData.usedQuestionIds = [];
+        const shuffledAll = shuffleArray(rawQuestionBank);
+        const needed = 25 - remainingFromCurrentCycle.length;
+        const newPart = shuffledAll.filter(q => !remainingFromCurrentCycle.some(r => r.id === q.id)).slice(0, needed);
+        
+        const combined = shuffleArray([...remainingFromCurrentCycle, ...newPart]);
+        appData.usedQuestionIds = combined.map(q => q.id);
+        saveAppData();
+        return combined;
+      } else {
+        const picked = shuffleArray(unused).slice(0, 25);
+        appData.usedQuestionIds = [...appData.usedQuestionIds, ...picked.map(q => q.id)];
+        saveAppData();
+        return picked;
+      }
+    }
+
+    function initQuizSession(withTimer) {
+      hideModeModal();
+
+      const questions = select25SessionQuestions();
+      sessionState = {
+        questions: questions,
+        currentIndex: 0,
+        correctCount: 0,
+        wrongCount: 0,
+        streak: 0,
+        isTimerActive: withTimer,
+        timerSeconds: 20,
+        timerInterval: null,
+        startTime: Date.now(),
+        selectedAnswered: false
+      };
+
+      appData.lastSessionWrong = [];
+      
+      document.getElementById('timer-badge').style.display = withTimer ? 'inline-flex' : 'none';
+      switchView('quiz-view');
+      renderCurrentQuestion();
+    }
+
+    function renderCurrentQuestion() {
+      const q = sessionState.questions[sessionState.currentIndex];
+      sessionState.selectedAnswered = false;
+
+      document.getElementById('quiz-progress-text').innerText = `Soal ${sessionState.currentIndex + 1} dari 25`;
+      document.getElementById('quiz-progress-fill').style.width = `${((sessionState.currentIndex) / 25) * 100}%`;
+      document.getElementById('live-correct').innerText = sessionState.correctCount;
+      document.getElementById('live-wrong').innerText = sessionState.wrongCount;
+      document.getElementById('streak-badge').innerText = `🔥 Streak: ${sessionState.streak}`;
+
+      document.getElementById('feedback-banner').style.display = 'none';
+      const nextBtn = document.getElementById('next-btn');
+      nextBtn.style.display = 'none';
+      nextBtn.innerText = sessionState.currentIndex === 24 ? "Lihat Hasil 📊" : "Soal Berikutnya ➡️";
+
+      document.getElementById('question-text').innerText = q.q;
+
+      const optionsContainer = document.getElementById('options-container');
+      optionsContainer.innerHTML = '';
+      const prefixes = ['A', 'B', 'C', 'D'];
+
+      q.options.forEach((optText, idx) => {
+        const card = document.createElement('div');
+        card.className = 'option-card';
+        card.onclick = () => handleSelectAnswer(idx);
+        card.innerHTML = `
+          <div class="option-prefix">${prefixes[idx]}</div>
+          <div>${optText}</div>
+        `;
+        optionsContainer.appendChild(card);
+      });
+
+      if (sessionState.isTimerActive) {
+        startTimer();
+      }
+    }
+
+    function startTimer() {
+      clearInterval(sessionState.timerInterval);
+      sessionState.timerSeconds = 20;
+      document.getElementById('timer-val').innerText = sessionState.timerSeconds;
+
+      sessionState.timerInterval = setInterval(() => {
+        sessionState.timerSeconds--;
+        document.getElementById('timer-val').innerText = sessionState.timerSeconds;
+
+        if (sessionState.timerSeconds <= 0) {
+          clearInterval(sessionState.timerInterval);
+          handleSelectAnswer(-1);
+        }
+      }, 1000);
+    }
+
+    function handleSelectAnswer(selectedIndex) {
+      if (sessionState.selectedAnswered) return;
+      sessionState.selectedAnswered = true;
+      clearInterval(sessionState.timerInterval);
+
+      const q = sessionState.questions[sessionState.currentIndex];
+      const isCorrect = selectedIndex === q.answer;
+      const optionCards = document.querySelectorAll('.option-card');
+
+      optionCards.forEach(card => card.classList.add('disabled'));
+
+      if (isCorrect) {
+        sessionState.correctCount++;
+        sessionState.streak++;
+        appData.xp += 10;
+        playSound('correct');
+
+        if (selectedIndex >= 0 && optionCards[selectedIndex]) {
+          optionCards[selectedIndex].classList.add('correct');
+        }
+
+        showFeedback(true, q.explain);
+      } else {
+        sessionState.wrongCount++;
+        sessionState.streak = 0;
+        playSound('wrong');
+
+        if (selectedIndex >= 0 && optionCards[selectedIndex]) {
+          optionCards[selectedIndex].classList.add('wrong');
+        }
+
+        if (optionCards[q.answer]) {
+          optionCards[q.answer].classList.add('correct');
+        }
+
+        appData.lastSessionWrong.push({
+          question: q.q,
+          userAnswer: selectedIndex >= 0 ? q.options[selectedIndex] : "Waktu Habis",
+          correctAnswer: q.options[q.answer],
+          explain: q.explain
+        });
+
+        showFeedback(false, q.explain);
+      }
+
+      document.getElementById('live-correct').innerText = sessionState.correctCount;
+      document.getElementById('live-wrong').innerText = sessionState.wrongCount;
+      document.getElementById('streak-badge').innerText = `🔥 Streak: ${sessionState.streak}`;
+      document.getElementById('next-btn').style.display = 'inline-flex';
+    }
+
+    function showFeedback(isCorrect, explainText) {
+      const banner = document.getElementById('feedback-banner');
+      const title = document.getElementById('feedback-title');
+      const explain = document.getElementById('feedback-explain');
+
+      banner.style.display = 'block';
+      if (isCorrect) {
+        banner.className = 'feedback-banner correct';
+        title.innerText = '正解！ — Jawaban Benar!';
+      } else {
+        banner.className = 'feedback-banner wrong';
+        title.innerText = '残念！ — Belum Tepat!';
+      }
+      explain.innerText = explainText || '';
+    }
+
+    function nextQuestion() {
+      sessionState.currentIndex++;
+
+      if (sessionState.currentIndex < 25) {
+        renderCurrentQuestion();
+      } else {
+        finishQuizSession();
+      }
+    }
+
+    function finishQuizSession() {
+      const score = sessionState.correctCount * 4;
+      const totalTimeMs = Date.now() - sessionState.startTime;
+      const minutes = Math.floor(totalTimeMs / 60000);
+      const seconds = Math.floor((totalTimeMs % 60000) / 1000);
+      const timeStr = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+      const accuracy = Math.round((sessionState.correctCount / 25) * 100);
+
+      appData.sessionsCompleted++;
+      appData.totalAnsweredLifetime += 25;
+      appData.totalCorrectLifetime += sessionState.correctCount;
+      if (score > appData.highScore) {
+        appData.highScore = score;
+      }
+
+      checkAndGrantBadges(score, accuracy);
+      saveAppData();
+
+      document.getElementById('result-score').innerText = score;
+      document.getElementById('res-correct').innerText = sessionState.correctCount;
+      document.getElementById('res-wrong').innerText = sessionState.wrongCount;
+      document.getElementById('res-accuracy').innerText = `${accuracy}%`;
+      document.getElementById('res-time').innerText = timeStr;
+
+      const catEl = document.getElementById('result-category');
+      const msgEl = document.getElementById('result-motivation-msg');
+
+      if (score >= 90) {
+        catEl.innerText = "すごい！ Luar Biasa!";
+        msgEl.innerText = "Pemahaman bahasa Jepangmu sangat hebat! Pertahankan prestasimu!";
+        launchConfetti();
+      } else if (score >= 75) {
+        catEl.innerText = "よくできました！ Kerja Bagus!";
+        msgEl.innerText = "Hasil yang sangat memuaskan! Kamu sudah menguasai materi ini dengan baik.";
+        launchConfetti();
+      } else if (score >= 60) {
+        catEl.innerText = "がんばって！ Terus Berlatih!";
+        msgEl.innerText = "Sudah cukup bagus! Sedikit latihan lagi untuk mencapai skor maksimal.";
+      } else {
+        catEl.innerText = "あきらめないで！ Jangan Menyerah!";
+        msgEl.innerText = "Jangan berkecil hati, pelajari kembali soal yang salah dan coba lagi!";
+      }
+
+      switchView('result-view');
+    }
+
+    function startNewSession() {
+      showModeModal();
+    }
+
+    function checkAndGrantBadges(score, accuracy) {
+      if (!appData.badges) appData.badges = [];
+
+      if (appData.sessionsCompleted >= 1 && !appData.badges.includes('first-step')) {
+        appData.badges.push('first-step');
+      }
+      if (score === 100 && !appData.badges.includes('perfect')) {
+        appData.badges.push('perfect');
+      }
+      if (accuracy >= 90 && !appData.badges.includes('hiragana')) {
+        appData.badges.push('hiragana');
+      }
+      if (appData.sessionsCompleted >= 4 && !appData.badges.includes('persistent')) {
+        appData.badges.push('persistent');
+      }
+    }
+
+    function updateBadgesUI() {
+      const badgesMap = {
+        'first-step': 'badge-first-step',
+        'perfect': 'badge-perfect',
+        'hiragana': 'badge-hiragana',
+        'persistent': 'badge-persistent'
+      };
+
+      Object.keys(badgesMap).forEach(key => {
+        const el = document.getElementById(badgesMap[key]);
+        if (el) {
+          if (appData.badges && appData.badges.includes(key)) {
+            el.classList.add('unlocked');
+          } else {
+            el.classList.remove('unlocked');
+          }
+        }
+      });
+    }
+
+    function renderReviewList() {
+      const container = document.getElementById('review-list-container');
+      container.innerHTML = '';
+
+      if (!appData.lastSessionWrong || appData.lastSessionWrong.length === 0) {
+        container.innerHTML = `
+          <div class="card" style="text-align: center; color: var(--success);">
+            🎉 Perfect! Tidak ada jawaban yang salah pada sesi terakhir.
+          </div>
+        `;
+        return;
+      }
+
+      appData.lastSessionWrong.forEach((item, idx) => {
+        const div = document.createElement('div');
+        div.className = 'review-item';
+        div.innerHTML = `
+          <div style="font-weight: 700; font-size: 1.1rem; margin-bottom: 6px;">${idx + 1}. ${item.question}</div>
+          <div style="font-size: 0.9rem; color: var(--danger); margin-bottom: 2px;">❌ Jawaban Anda: <strong>${item.userAnswer}</strong></div>
+          <div style="font-size: 0.9rem; color: var(--success); margin-bottom: 6px;">✅ Jawaban Benar: <strong>${item.correctAnswer}</strong></div>
+          <div style="font-size: 0.85rem; color: var(--text-muted); background: #F9F9F9; padding: 6px 10px; border-radius: 6px;">💡 ${item.explain}</div>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function renderHiraganaGrid() {
+      const container = document.getElementById('hiragana-container');
+      container.innerHTML = '';
+
+      hiraganaList.forEach(item => {
+        const card = document.createElement('div');
+        if (!item.c) {
+          card.style.visibility = 'hidden';
+        } else {
+          card.className = 'kana-card';
+          card.onclick = () => speakJapanese(item.c);
+          card.innerHTML = `
+            <div class="kana-char">${item.c}</div>
+            <div class="kana-romaji">${item.r}</div>
+          `;
+        }
+        container.appendChild(card);
+      });
+    }
+
+    function speakJapanese(text) {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'ja-JP';
+        utterance.rate = 0.9;
+        window.speechSynthesis.speak(utterance);
+      }
+    }
+
+    function playSound(type) {
+      if (isAudioMuted) return;
+      try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return;
+        const ctx = new AudioCtx();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        if (type === 'correct') {
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(523.25, ctx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(659.25, ctx.currentTime + 0.15);
+          gain.gain.setValueAtTime(0.2, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+          osc.start();
+          osc.stop(ctx.currentTime + 0.3);
+        } else if (type === 'wrong') {
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(220, ctx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(150, ctx.currentTime + 0.25);
+          gain.gain.setValueAtTime(0.2, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+          osc.start();
+          osc.stop(ctx.currentTime + 0.3);
+        }
+      } catch (e) {
+        console.log("Audio tidak didukung atau diblokir browser");
+      }
+    }
+
+    function toggleSound() {
+      isAudioMuted = !isAudioMuted;
+      const btn = document.getElementById('sound-toggle-btn');
+      btn.innerText = isAudioMuted ? '🔇' : '🔊';
+    }
+
+    function launchConfetti() {
+      const canvas = document.getElementById('confetti-canvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      const pieces = [];
+      const colors = ['#D7000F', '#FFB703', '#2E7D32', '#2196F3', '#9C27B0'];
+
+      for (let i = 0; i < 70; i++) {
+        pieces.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height - canvas.height,
+          size: Math.random() * 8 + 4,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          speed: Math.random() * 3 + 2,
+          rotation: Math.random() * 360,
+          rotSpeed: Math.random() * 4 - 2
+        });
+      }
+
+      let frameCount = 0;
+      function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        pieces.forEach(p => {
+          p.y += p.speed;
+          p.rotation += p.rotSpeed;
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate((p.rotation * Math.PI) / 180);
+          ctx.fillStyle = p.color;
+          ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+          ctx.restore();
+        });
+
+        frameCount++;
+        if (frameCount < 180) {
+          requestAnimationFrame(animate);
+        } else {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+      }
+      animate();
+    }
+
+    function resetAllProgress() {
+      try {
+        localStorage.removeItem('nihongo_quest_data');
+      } catch(e) {}
+      
+      appData = {
+        xp: 0,
+        level: 1,
+        totalAnsweredLifetime: 0,
+        totalCorrectLifetime: 0,
+        sessionsCompleted: 0,
+        highScore: 0,
+        usedQuestionIds: [],
+        badges: [],
+        lastSessionWrong: []
+      };
+      hideResetConfirmModal();
+      updateDashboardUI();
+      switchView('home-view');
+      alert("Progres berhasil direset ke awal!");
+    }
+  </script>
+</body>
+</html>
